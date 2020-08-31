@@ -1,0 +1,41 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+void printboard(vector <vector <int> > board);
+
+int main(int argc, char** argv)
+{
+  vector <vector <int> > board { {-2, -3, -4, -5, -6, -4, -3, -2},
+                                 {-1, -1, -1, -1, -1, -1, -1, -1},
+                                 {0, 0, 0, 0, 0, 0, 0, 0},
+                                 {0, 0, 0, 0, 0, 0, 0, 0},
+                                 {0, 0, 0, 0, 0, 0, 0, 0},
+                                 {0, 0, 0, 0, 0, 0, 0, 0},
+                                 {1, 1, 1, 1, 1, 1, 1, 1},
+                                 {2, 3, 4, 5, 6, 4, 3, 2} };
+  printboard(board);
+}
+
+void printboard(vector <vector <int> > board)
+{
+  for (int i = 0; i < board[0].size(); i++) cout << char('A' + i) << "\t";
+  cout << endl;
+  for (int i = 0; i < board.size(); i++)
+  {
+    for (int j = 0; j < board[i].size(); j++)
+    {
+      if (board[i][j] == 0) cout << "_";
+      if (abs(board[i][j]) == 1) cout << "p";
+      if (abs(board[i][j]) == 2) cout << "r";
+      if (abs(board[i][j]) == 3) cout << "k";
+      if (abs(board[i][j]) == 4) cout << "b";
+      if (abs(board[i][j]) == 5) cout << "q";
+      if (abs(board[i][j]) == 6) cout << "k";
+      if (board[i][j] > 0) cout << "(w)";
+      if (board[i][j] < 0) cout << "(b)";
+      cout << "\t";
+    }
+    cout << board.size() - i << endl;
+  }
+}
