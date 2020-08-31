@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <string>
 using namespace std;
 
 void printboard(vector <vector <int> > board);
@@ -15,6 +16,14 @@ int main(int argc, char** argv)
                                  {1, 1, 1, 1, 1, 1, 1, 1},
                                  {2, 3, 4, 5, 6, 4, 3, 2} };
   printboard(board);
+
+  cout << "Select piece to move (ex. A1) ";
+  string grid;
+  cin >> grid;
+  int row = board.size() - (grid[1] - '0');
+  int col = grid[0] - 'A';
+
+  cout << "Here are possible moves:\n";
 }
 
 void printboard(vector <vector <int> > board)
