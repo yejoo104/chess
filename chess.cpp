@@ -13,7 +13,7 @@ int main(int argc, char** argv)
                                  {0, 0, 0, 0, 0, 0, 0, 0},
                                  {0, 0, 0, 0, 0, 0, 0, 0},
                                  {0, 0, 0, 0, 0, 0, 0, 0},
-                                 {0, 2, 0, 0, 0, 0, 0, 0},
+                                 {0, 0, 0, 0, 0, 0, 0, 0},
                                  {1, 1, 1, 1, 1, 1, 1, 1},
                                  {2, 3, 4, 5, 6, 4, 3, 2} };
   printboard(board);
@@ -136,6 +136,28 @@ vector <vector <int> > possiblemoves (vector <vector <int> > board, int row, int
           col + y[i] >= 0 && col + y[i] < board[0].size() &&
           board[row][col] * board[row + x[i]][col + y[i]] <= 0)
         possible.push_back({row + x[i], col + y[i]});
+  }
+
+  // Bishop
+  if (abs(board[row][col]) == 4)
+  {
+    int xdir[4] = {1, 1, -1, -1};
+    int ydir[4] = {-1, 1, -1, 1};
+
+    for (int i = 0; i < 4; i++)
+    {
+      int x = row + xdir[i];
+      int y = col + ydir[i];
+      while (x >= 0 && x < board.size() && y >= 0 && y < board[0].size() &&
+             board[x][y] == 0)
+      {
+        possible.push_back({x, y});
+        x += xdir[i];
+        y += ydir[i];
+      }
+      if (x >= 0 && x < board.size() && y >= 0 && y < board[0].size() &&
+          board[row][col] * board[x][y] < 0) possible.push_back({x, y});
+    }
   }
 
   return possible;
