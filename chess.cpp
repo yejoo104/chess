@@ -59,16 +59,17 @@ vector <vector <int> > possiblemoves (vector <vector <int> > board, int row, int
 {
   vector <vector <int> > possible;
 
-  // Pawn (White)
-  if (board[row][col] == 1)
+  // Pawn
+  if (abs(board[row][col]) == 1)
   {
-    if (row - 1 >= 0 && board[row - 1][col] == 0)
+    int dir = board[row][col] > 0 ? -1 : 1;
+    if (row + dir >= 0 && board[row + dir][col] == 0)
     {
-      possible.push_back({row - 1, col});
-      if (row - 2 >= 0 && board[row - 2][col] == 0) possible.push_back({row - 2, col});
+      possible.push_back({row + dir, col});
+      if (row + 2 * dir >= 0 && board[row + 2 * dir][col] == 0) possible.push_back({row + 2 * dir, col});
     }
-    if (col + 1 < board[0].size() && board[row - 1][col + 1] < 0) possible.push_back({row - 1, col + 1});
-    if (col - 1 >= 0 && board[row - 1][col - 1] < 0) possible.push_back({row - 1, col - 1});
+    if (col + 1 < board[0].size() && board[row][col] * board[row + dir][col + 1] < 0) possible.push_back({row + dir, col + 1});
+    if (col - 1 >= 0 && board[row][col] * board[row + dir][col - 1] < 0) possible.push_back({row + dir, col - 1});
   }
 
   return possible;
