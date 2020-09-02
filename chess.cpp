@@ -13,7 +13,7 @@ int main(int argc, char** argv)
                                  {0, 0, 0, 0, 0, 0, 0, 0},
                                  {0, 0, 0, 0, 0, 0, 0, 0},
                                  {0, 0, 0, 0, 0, 0, 0, 0},
-                                 {0, 0, 0, 0, 0, 0, 0, 0},
+                                 {0, 2, 0, 0, 0, 0, 0, 0},
                                  {1, 1, 1, 1, 1, 1, 1, 1},
                                  {2, 3, 4, 5, 6, 4, 3, 2} };
   printboard(board);
@@ -123,6 +123,19 @@ vector <vector <int> > possiblemoves (vector <vector <int> > board, int row, int
     }
     if (row + movement < board.size() && board[row][col] * board[row + movement][col] < 0)
       possible.push_back({row + movement, col});
+  }
+
+  // Knight
+  if (abs(board[row][col]) == 3)
+  {
+    int x[8] = {2, 2, 1, 1, -1, -1, -2, -2};
+    int y[8] = {1, -1, 2, -2, 2, -2, 1, -1};
+
+    for (int i = 0; i < 8; i++)
+      if (row + x[i] >= 0 && row + x[i] < board.size() &&
+          col + y[i] >= 0 && col + y[i] < board[0].size() &&
+          board[row][col] * board[row + x[i]][col + y[i]] <= 0)
+        possible.push_back({row + x[i], col + y[i]});
   }
 
   return possible;
