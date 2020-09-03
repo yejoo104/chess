@@ -1,12 +1,13 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <set>
 using namespace std;
 
 void printboard(vector <vector <int> > board);
 vector <int> stringtocoord (string input);
 vector <char> coordtostring(vector <int> coord);
-vector <vector <int> > possiblemoves (vector <vector <int> > board, int row, int col);
+set <vector <int> > possiblemoves (vector <vector <int> > board, int row, int col);
 
 int main(int argc, char** argv)
 {
@@ -18,23 +19,57 @@ int main(int argc, char** argv)
                                  {0, 0, 0, 0, 0, 0, 0, 0},
                                  {1, 1, 1, 1, 1, 1, 1, 1},
                                  {2, 3, 4, 5, 6, 4, 3, 2} };
-  printboard(board);
 
-  cout << "Select piece to move (ex. A1) ";
-  string grid;
-  cin >> grid;
-  vector <int> coord = stringtocoord(grid);
-  int row = coord[0];
-  int col = coord[1];
-
-  cout << "Here are possible moves:\n";
-  vector <vector <int> > possible = possiblemoves(board, row, col);
-  for (int i = 0; i < possible.size(); i++)
+  bool validinput;
+  while (true)
   {
-    vector<char> coord = coordtostring(possible[i]);
-    cout << coord[0] << coord[1] << " ";
+    int row;
+    int col;
+    int newrow;
+    int newcol;
+    // White's Turn
+    cout << "White's turn\n";
+    printboard(board);
+    validinput = false;
+    while (!validinput)
+    {
+      cout << "Select piece to move (ex. A1) ";
+      string input;
+      cin >> input;
+      vector <int> coord = stringtocoord(input);
+      row = coord[0];
+      col = coord[1];
+      if (board[row][col] > 0) validinput = true;
+    }
+
+    // Possible Moves by White
+    cout << "Here are possible moves:\n";
+    set <vector <int> > possible = possiblemoves(board, row, col);
+
+    for (auto element : possible)
+    {
+      vector<char> coord = coordtostring(element);
+      cout << coord[0] << coord[1] << " ";
+    }
+    cout << endl;
+
+    // Input Move
+    validinput = false;
+    while (!validinput)
+    {
+      cout << "Select where to move (ex. A1) ";
+      string input;
+      cin >> input;
+      vector <int> newcoord = stringtocoord(input);
+      newrow = newcoord[0];
+      newcol = newcoord[1];
+      if (possible.find({newrow, newcol}) != possible.end()) validinput = true;
+    }
+
+    // Move
+    board[newrow][newcol] = board[row][col];
+    board[row][col] = 0;
   }
-  cout << endl;
 }
 
 void printboard(vector <vector <int> > board)
@@ -75,9 +110,9 @@ vector <char> coordtostring(vector <int> coord)
   return s;
 }
 
-vector <vector <int> > possiblemoves (vector <vector <int> > board, int row, int col)
+set <vector <int> > possiblemoves (vector <vector <int> > board, int row, int col)
 {
-  vector <vector <int> > possible;
+  set <vector <int> > possible;
 
   // Pawn
   if (abs(board[row][col]) == 1)
@@ -88,16 +123,16 @@ vector <vector <int> > possiblemoves (vector <vector <int> > board, int row, int
     // If there is no piece directly in front
     if (row + dir >= 0 && board[row + dir][col] == 0)
     {
-      possible.push_back({row + dir, col});
+      possible.insert({row + dir, col});
 
       // If there is no piece two steps in front
       if (row + 2 * dir >= 0 && board[row + 2 * dir][col] == 0)
-        possible.push_back({row + 2 * dir, col});
+        possible.insert({row + 2 * dir, col});
     }
 
     // If there are opponent pieces to the front diagonal
-    if (col + 1 < board[0].size() && board[row][col] * board[row + dir][col + 1] < 0) possible.push_back({row + dir, col + 1});
-    if (col - 1 >= 0 && board[row][col] * board[row + dir][col - 1] < 0) possible.push_back({row + dir, col - 1});
+    if (col + 1 < board[0].size() && board[row][col] * board[row + dir][col + 1] < 0) possible.insert({row + dir, col + 1});
+    if (col - 1 >= 0 && board[row][col] * board[row + dir][col - 1] < 0) possible.insert({row + dir, col - 1});
   }
 
   // Rook and Queen: sides
@@ -113,12 +148,12 @@ vector <vector <int> > possiblemoves (vector <vector <int> > board, int row, int
       while (x >= 0 && x < board.size() && y >= 0 && y < board[0].size() &&
              board[x][y] == 0)
       {
-        possible.push_back({x, y});
+        possible.insert({x, y});
         x += xdir[i];
         y += ydir[i];
       }
       if (x >= 0 && x < board.size() && y >= 0 && y < board[0].size() &&
-          board[row][col] * board[x][y] < 0) possible.push_back({x, y});
+          board[row][col] * board[x][y] < 0) possible.insert({x, y});
     }
   }
 
@@ -134,7 +169,7 @@ vector <vector <int> > possiblemoves (vector <vector <int> > board, int row, int
       int y = col + ydir[i];
       if (x >= 0 && x < board.size() && y >= 0 && y < board[0].size() &&
           board[row][col] * board[x][y] <= 0)
-        possible.push_back({x, y});
+        possible.insert({x, y});
     }
   }
 
@@ -151,12 +186,12 @@ vector <vector <int> > possiblemoves (vector <vector <int> > board, int row, int
       while (x >= 0 && x < board.size() && y >= 0 && y < board[0].size() &&
              board[x][y] == 0)
       {
-        possible.push_back({x, y});
+        possible.insert({x, y});
         x += xdir[i];
         y += ydir[i];
       }
       if (x >= 0 && x < board.size() && y >= 0 && y < board[0].size() &&
-          board[row][col] * board[x][y] < 0) possible.push_back({x, y});
+          board[row][col] * board[x][y] < 0) possible.insert({x, y});
     }
   }
 
@@ -171,7 +206,7 @@ vector <vector <int> > possiblemoves (vector <vector <int> > board, int row, int
       int x = row + xdir[i];
       int y = col + ydir[i];
       if (x >= 0 && x < board.size() && y >= 0 && y < board[0].size() &&
-          board[row][col] * board[x][y] <= 0) possible.push_back({x, y});
+          board[row][col] * board[x][y] <= 0) possible.insert({x, y});
     }
   }
 
