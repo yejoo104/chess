@@ -80,49 +80,26 @@ vector <vector <int> > possiblemoves (vector <vector <int> > board, int row, int
     if (col - 1 >= 0 && board[row][col] * board[row + dir][col - 1] < 0) possible.push_back({row + dir, col - 1});
   }
 
-  // Rook
-  if (abs(board[row][col]) == 2)
+  // Rook and Queen: sides
+  if (abs(board[row][col]) == 2 || abs(board[row][col]) == 5)
   {
-    int movement = 1;
-
-    // Moves to the Left
-    while (col - movement >= 0 && board[row][col - movement] == 0)
+    // Sides
+    int xdir[4] = {1, -1, 0, 0};
+    int ydir[4] = {0, 0, 1, -1};
+    for (int i = 0; i < 4; i++)
     {
-      possible.push_back({row, col - movement});
-      movement++;
+      int x = row + xdir[i];
+      int y = col + ydir[i];
+      while (x >= 0 && x < board.size() && y >= 0 && y < board[0].size() &&
+             board[x][y] == 0)
+      {
+        possible.push_back({x, y});
+        x += xdir[i];
+        y += ydir[i];
+      }
+      if (x >= 0 && x < board.size() && y >= 0 && y < board[0].size() &&
+          board[row][col] * board[x][y] < 0) possible.push_back({x, y});
     }
-    if (col - movement >= 0 && board[row][col] * board[row][col - movement] < 0)
-      possible.push_back({row, col - movement});
-
-    // Moves to the Right
-    movement = 1;
-    while (col + movement < board[0].size() && board[row][col + movement] == 0)
-    {
-      possible.push_back({row, col + movement});
-      movement++;
-    }
-    if (col + movement < board[0].size() && board[row][col] * board[row][col + movement] < 0)
-      possible.push_back({row, col + movement});
-
-    // Moves Up
-    movement = 1;
-    while (row - movement >= 0 && board[row - movement][col] == 0)
-    {
-      possible.push_back({row - movement, col});
-      movement++;
-    }
-    if (row - movement >= 0 && board[row][col] * board[row - movement][col] < 0)
-      possible.push_back({row - movement, col});
-
-    // Moves Down
-    movement = 1;
-    while (row + movement < board.size() && board[row + movement][col] == 0)
-    {
-      possible.push_back({row + movement, col});
-      movement++;
-    }
-    if (row + movement < board.size() && board[row][col] * board[row + movement][col] < 0)
-      possible.push_back({row + movement, col});
   }
 
   // Knight
@@ -138,8 +115,8 @@ vector <vector <int> > possiblemoves (vector <vector <int> > board, int row, int
         possible.push_back({row + x[i], col + y[i]});
   }
 
-  // Bishop
-  if (abs(board[row][col]) == 4)
+  // Bishop and Queen: Diagonals
+  if (abs(board[row][col]) == 4 || abs(board[row][col]) == 5)
   {
     int xdir[4] = {1, 1, -1, -1};
     int ydir[4] = {-1, 1, -1, 1};
