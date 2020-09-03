@@ -72,7 +72,8 @@ vector <vector <int> > possiblemoves (vector <vector <int> > board, int row, int
       possible.push_back({row + dir, col});
 
       // If there is no piece two steps in front
-      if (row + 2 * dir >= 0 && board[row + 2 * dir][col] == 0) possible.push_back({row + 2 * dir, col});
+      if (row + 2 * dir >= 0 && board[row + 2 * dir][col] == 0)
+        possible.push_back({row + 2 * dir, col});
     }
 
     // If there are opponent pieces to the front diagonal
@@ -105,14 +106,17 @@ vector <vector <int> > possiblemoves (vector <vector <int> > board, int row, int
   // Knight
   if (abs(board[row][col]) == 3)
   {
-    int x[8] = {2, 2, 1, 1, -1, -1, -2, -2};
-    int y[8] = {1, -1, 2, -2, 2, -2, 1, -1};
+    int xdir[8] = {2, 2, 1, 1, -1, -1, -2, -2};
+    int ydir[8] = {1, -1, 2, -2, 2, -2, 1, -1};
 
     for (int i = 0; i < 8; i++)
-      if (row + x[i] >= 0 && row + x[i] < board.size() &&
-          col + y[i] >= 0 && col + y[i] < board[0].size() &&
-          board[row][col] * board[row + x[i]][col + y[i]] <= 0)
-        possible.push_back({row + x[i], col + y[i]});
+    {
+      int x = row + xdir[i];
+      int y = col + ydir[i];
+      if (x >= 0 && x < board.size() && y >= 0 && y < board[0].size() &&
+          board[row][col] * board[x][y] <= 0)
+        possible.push_back({x, y});
+    }
   }
 
   // Bishop and Queen: Diagonals
@@ -134,6 +138,21 @@ vector <vector <int> > possiblemoves (vector <vector <int> > board, int row, int
       }
       if (x >= 0 && x < board.size() && y >= 0 && y < board[0].size() &&
           board[row][col] * board[x][y] < 0) possible.push_back({x, y});
+    }
+  }
+
+  // King
+  if (abs(board[row][col]) == 6)
+  {
+    int xdir[8] = {-1, -1, -1, 0, 0, 1, 1, 1};
+    int ydir[8] = {-1, 0, 1, -1, 1, -1, 0, 1};
+
+    for (int i = 0; i < 8; i++)
+    {
+      int x = row + xdir[i];
+      int y = col + ydir[i];
+      if (x >= 0 && x < board.size() && y >= 0 && y < board[0].size() &&
+          board[row][col] * board[x][y] <= 0) possible.push_back({x, y});
     }
   }
 
