@@ -4,6 +4,8 @@
 using namespace std;
 
 void printboard(vector <vector <int> > board);
+vector <int> stringtocoord (string input);
+vector <char> coordtostring(vector <int> coord);
 vector <vector <int> > possiblemoves (vector <vector <int> > board, int row, int col);
 
 int main(int argc, char** argv)
@@ -21,14 +23,16 @@ int main(int argc, char** argv)
   cout << "Select piece to move (ex. A1) ";
   string grid;
   cin >> grid;
-  int row = board.size() - (grid[1] - '0');
-  int col = grid[0] - 'A';
+  vector <int> coord = stringtocoord(grid);
+  int row = coord[0];
+  int col = coord[1];
 
   cout << "Here are possible moves:\n";
   vector <vector <int> > possible = possiblemoves(board, row, col);
   for (int i = 0; i < possible.size(); i++)
   {
-    cout << char(possible[i][1] + 'A') << board.size() - possible[i][0] << " ";
+    vector<char> coord = coordtostring(possible[i]);
+    cout << coord[0] << coord[1] << " ";
   }
   cout << endl;
 }
@@ -54,6 +58,21 @@ void printboard(vector <vector <int> > board)
     }
     cout << board.size() - i << endl;
   }
+}
+
+vector <int> stringtocoord (string input)
+{
+  int row = 8 - (input[1] - '0');
+  int col = input[0] - 'A';
+  return {row, col};
+}
+
+vector <char> coordtostring(vector <int> coord)
+{
+  vector<char> s(2);
+  s[0] = char(coord[1] + 'A');
+  s[1] = 8 - coord[0] + '0';
+  return s;
 }
 
 vector <vector <int> > possiblemoves (vector <vector <int> > board, int row, int col)
