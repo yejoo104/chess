@@ -43,6 +43,8 @@ int main(int argc, char** argv)
       cout << "Select piece to move (ex. A1) ";
       string input;
       cin >> input;
+      if (input.length() != 2 || input[0] < 'A' || input[0] > 'H' || input[1] < '1' || input[1] > '8')
+        continue;
       vector <int> coord = stringtocoord(input);
       row = coord[0];
       col = coord[1];
@@ -53,6 +55,11 @@ int main(int argc, char** argv)
     // Possible Moves by Player
     cout << "Here are possible moves:\n";
     set <vector <int> > possible = possiblemoves(board, row, col);
+    if (possible.empty())
+    {
+      cout << "No possible moves\n";
+      continue;
+    }
 
     for (auto element : possible)
     {
@@ -68,6 +75,8 @@ int main(int argc, char** argv)
       cout << "Select where to move (ex. A1) ";
       string input;
       cin >> input;
+      if (input.length() != 2 || input[0] < 'A' || input[0] > 'H' || input[1] < '1' || input[1] > '8')
+        continue;
       vector <int> newcoord = stringtocoord(input);
       newrow = newcoord[0];
       newcol = newcoord[1];
@@ -142,8 +151,9 @@ set <vector <int> > possiblemoves (vector <vector <int> > board, int row, int co
     {
       possible.insert({row + dir, col});
 
-      // If there is no piece two steps in front
-      if (row + 2 * dir >= 0 && board[row + 2 * dir][col] == 0)
+      // If pawn is at starting point there is no piece two steps in front
+      bool starting = (dir == 1 && row == 1) || (dir == -1 && row == 6);
+      if (starting && row + 2 * dir >= 0 && board[row + 2 * dir][col] == 0)
         possible.insert({row + 2 * dir, col});
     }
 
