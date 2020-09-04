@@ -21,15 +21,22 @@ int main(int argc, char** argv)
                                  {2, 3, 4, 5, 6, 4, 3, 2} };
 
   bool validinput;
-  while (true)
+  bool white = true;
+  bool win = false;
+  while (!win)
   {
     int row;
     int col;
     int newrow;
     int newcol;
-    // White's Turn
-    cout << "White's turn\n";
+
+    // Player's Turn
+    if (white) cout << "White's Turn\n";
+    else cout << "Black's Turn\n";
+
     printboard(board);
+
+    // Make Sure Player Chooses Valid Piece to Move
     validinput = false;
     while (!validinput)
     {
@@ -39,10 +46,11 @@ int main(int argc, char** argv)
       vector <int> coord = stringtocoord(input);
       row = coord[0];
       col = coord[1];
-      if (board[row][col] > 0) validinput = true;
+      if (white && board[row][col] > 0) validinput = true;
+      if (!white && board[row][col] < 0) validinput = true;
     }
 
-    // Possible Moves by White
+    // Possible Moves by Player
     cout << "Here are possible moves:\n";
     set <vector <int> > possible = possiblemoves(board, row, col);
 
@@ -66,10 +74,19 @@ int main(int argc, char** argv)
       if (possible.find({newrow, newcol}) != possible.end()) validinput = true;
     }
 
-    // Move
+    // Move (Check if game is won)
+    if (abs(board[newrow][newcol]) == 6) win = true;
     board[newrow][newcol] = board[row][col];
     board[row][col] = 0;
+
+    // Next Player
+    white = !white;
   }
+
+  // Print Winner
+  if (white) cout << "Black wins";
+  else cout << "White wins";
+  printboard(board);
 }
 
 void printboard(vector <vector <int> > board)
