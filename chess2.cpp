@@ -41,9 +41,7 @@ int main (int arg, char** argv)
 
   int row;
   int col;
-  int newrow;
-  int newcol;
-  bool move = true;
+  set <vector <int> > possible;
 
   // Game Runs
   while (app.isOpen())
@@ -53,35 +51,30 @@ int main (int arg, char** argv)
     int y = pos.y / w;
 
     Event e;
-    while (app.pollEvent(e))
+    while(app.pollEvent(e))
     {
       if (e.type == Event::Closed) app.close();
 
-      if (e.type == Event::MouseButtonPressed)
-        if (e.key.code == Mouse::Left)
+      if (e.type == Event::MouseButtonPressed && e.key.code == Mouse::Left)
+      {
+        if (possible.find({y, x}) != possible.end())
         {
-          if (move)
-          {
-            col = x;
-            row = y;
-          }
-          else
-          {
-            newcol = x;
-            newrow = y;
-          }
-          move = !move;
+          board[y][x] = board[row][col];
+          board[row][col] = 0;
+          possible = set <vector <int> > ();
         }
+        else if (board[y][x] != 0)
+        {
+          col = x;
+          row = y;
+          possible = possiblemoves(board, row, col);
+        }
+        else possible = set <vector <int> > ();
+      }
     }
 
     app.clear(Color::White);
     app.draw(chessboard);
-
-    set <vector <int> > possible;
-    if (!move)
-    {
-      possible = possiblemoves(board, row, col);
-    }
 
     for (int i = 0; i < board.size(); i++)
       for (int j = 0; j < board[i].size(); j++)
