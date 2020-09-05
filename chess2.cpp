@@ -39,9 +39,21 @@ int main (int arg, char** argv)
   int w = 90;
   RenderWindow app(VideoMode(8 * w, 8 * w), "Chess");
 
+  // Winner Message
+  Font font;
+  font.loadFromFile("Ka Blam.ttf");
+  Text winner;
+  winner.setFont(font);
+  winner.setCharacterSize(w);
+  winner.setFillColor(Color::Black);
+  winner.setStyle(Text::Bold);
+
+  // Variables for Game to Run
   int row;
   int col;
   set <vector <int> > possible;
+  bool white = true;
+  bool win = false;
 
   // Game Runs
   while (app.isOpen())
@@ -55,15 +67,17 @@ int main (int arg, char** argv)
     {
       if (e.type == Event::Closed) app.close();
 
-      if (e.type == Event::MouseButtonPressed && e.key.code == Mouse::Left)
+      if (!win && e.type == Event::MouseButtonPressed && e.key.code == Mouse::Left)
       {
         if (possible.find({y, x}) != possible.end())
         {
+          if (abs(board[y][x]) == 1) win = true;
           board[y][x] = board[row][col];
           board[row][col] = 0;
           possible = set <vector <int> > ();
+          white = !white;
         }
-        else if (board[y][x] != 0)
+        else if ((white && board[y][x] > 0) || (!white && board[y][x] < 0))
         {
           col = x;
           row = y;
@@ -93,6 +107,16 @@ int main (int arg, char** argv)
       dot.setPosition((elem[1] + 0.5) * w - 11.25, (elem[0] + 0.5) * w - 11.25);
       app.draw(dot);
     }
+
+    if (win)
+    {
+      if (white) winner.setString("BLACK WINS");
+      else winner.setString("WHITE WINS");
+      winner.setPosition(4 * w, 4 * w);
+      winner.setOrigin(winner.getLocalBounds().width / 2.0f, winner.getLocalBounds().height / 2.0f);
+      app.draw(winner);
+    }
+
     app.display();
   }
 }
