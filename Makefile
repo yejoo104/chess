@@ -1,3 +1,6 @@
+chessoop: chessoop.cpp
+	g++ -std=c++17 -o chessoop chessoop.cpp
+
 chess3: chess3.cpp
 	g++ -std=c++17 -o chess3 chess3.cpp -lsfml-graphics -lsfml-window -lsfml-system
 
