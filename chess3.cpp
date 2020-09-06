@@ -8,7 +8,9 @@ using namespace std;
 using namespace sf;
 
 set <vector <int> > possiblemoves (vector <vector <int> > board, int row, int col);
-vector <int> computerrandom (vector <vector <int>> board, bool white);
+vector <vector <int> > possiblefromboard (vector <vector <int> > board, bool white);
+vector <int> computerrandom (vector <vector <int> > board, bool white);
+vector <int> computernexteval (vector <vector <int> > board, bool white);
 
 int main (int arg, char** argv)
 {
@@ -124,7 +126,7 @@ int main (int arg, char** argv)
     // If black's turn, computer makes move
     if (!win && !white)
     {
-      vector<int> newmove = computerrandom(board, false);
+      vector<int> newmove = computernexteval(board, false);
       if (board[newmove[2]][newmove[3]] == 1) win = true;
       board[newmove[2]][newmove[3]] = board[newmove[0]][newmove[1]];
       board[newmove[0]][newmove[1]] = 0;
@@ -237,7 +239,7 @@ set <vector <int> > possiblemoves (vector <vector <int> > board, int row, int co
   return possible;
 }
 
-vector <int> computerrandom (vector <vector <int>> board, bool white)
+vector <vector <int> > possiblefromboard (vector <vector <int> > board, bool white)
 {
   // Find all possible moves from the side
   vector <vector <int> > possible;
@@ -249,6 +251,13 @@ vector <int> computerrandom (vector <vector <int>> board, bool white)
         for (auto elem : possiblehere) possible.push_back({i, j, elem[0], elem[1]});
       }
 
+  return possible;
+}
+
+vector <int> computerrandom (vector <vector <int> > board, bool white)
+{
+  vector <vector <int> > possible = possiblefromboard(board, white);
+
   // Choose Random Move
   random_device device;
   mt19937 generator(device());
@@ -257,4 +266,52 @@ vector <int> computerrandom (vector <vector <int>> board, bool white)
   int random = dis(generator);
 
   return possible[random];
+}
+
+int evaluate (vector <vector <int> > board, vector <int> move)
+{
+  board[move[2]][move[3]] = board[move[0]][move[1]];
+  board[move[0]][move[1]] = 0;
+
+  int value = 0;
+  for (int i = 0; i < board.size(); i++)
+    for (int j = 0; j < board[i].size(); j++)
+    {
+      if (abs(board[i][j]) == 6) value += (board[i][j] / 6 * 10);
+      if (abs(board[i][j]) == 5) value += (board[i][j] * 10);
+      if (abs(board[i][j]) == 4) value += (board[i][j] / 4 * 30);
+      if (abs(board[i][j]) == 3) value += (board[i][j] / 3 * 30);
+      if (abs(board[i][j]) == 2) value += (board[i][j] / 2 * 90);
+      if (abs(board[i][j]) == 1) value += (board[i][j] * 900);
+    }
+
+  return value;
+}
+
+vector <int> computernexteval (vector <vector <int> > board, bool white)
+{
+  vector <vector <int> > possible = possiblefromboard(board, white);
+
+  vector <int> values;
+  int val = evaluate(board, possible[0]);
+  values.push_back(val);
+  for (int i = 1; i < possible.size(); i++)
+  {
+    int evaluation = evaluate(board, possible[i]);
+    values.push_back(evaluation);
+    if ((white && evaluation > val) || (!white && evaluation < val)) val = evaluation;
+  }
+
+  vector <int> indices;
+  for (int i = 0; i < values.size(); i++)
+  {
+    if (val == values[i]) indices.push_back(i);
+  }
+
+  // Choose Random Move
+  random_device device;
+  mt19937 generator(device());
+  uniform_int_distribution<> dis(0, indices.size() - 1);
+
+  return possible[indices[dis(generator)]];
 }
