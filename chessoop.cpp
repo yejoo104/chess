@@ -7,7 +7,7 @@ using namespace sf;
 class Piece;
 class Square;
 class Board;
-enum piecetype {Pa, Ro, Kn, Bi, Qu, Ki};
+enum piecetype {No, Pa, Ro, Kn, Bi, Qu, Ki};
 
 class Piece
 {
@@ -42,6 +42,15 @@ class Piece
       return this->type;
     }
     vector <Square> possiblemoves(Board board, Square location);
+};
+
+class None: public Piece
+{
+  public:
+    None (bool white) : Piece(white)
+    {
+      type = No;
+    }
 };
 
 class Pawn: public Piece
@@ -177,7 +186,7 @@ class Board
       board[7].push_back(Square(Rook(false), 7, 7));
       for (int i = 2; i < 6; i++)
         for (int j = 0; j < 8; j++)
-          board[i].push_back(Square(NULL, i, j));
+          board[i].push_back(Square(None(true), i, j));
     }
 };
 
@@ -211,13 +220,36 @@ int main (int arg, char** argv)
     for (int i = 0; i < 8; i++)
       for (int j = 0; j < 8; j++)
       {
+        int piece = -1;
         Piece p = board.getLocation(i, j).getPiece();
-        if (p.getPiecetype() == Ro && p.getWhite())
+        int side = p.getWhite() ? 0 : 1;
+        if (p.getPiecetype() == No) continue;
+        switch(p.getPiecetype())
         {
-          pieces.setTextureRect(IntRect(360, 0, w, w));
-          pieces.setPosition(j * w, i * w);
-          app.draw(pieces);
+          case Pa:
+            piece = 5;
+            break;
+          case Ro:
+            piece = 4;
+            break;
+          case Kn:
+            piece = 3;
+            break;
+          case Bi:
+            piece = 2;
+            break;
+          case Qu:
+            piece = 1;
+            break;
+          case Ki:
+            piece = 0;
+            break;
+          case No:
+            break;
         }
+        pieces.setTextureRect(IntRect(w * piece, w * side, w, w));
+        pieces.setPosition(j * w, i * w);
+        app.draw(pieces);
       }
 
     app.display();
