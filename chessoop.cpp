@@ -4,11 +4,54 @@
 using namespace std;
 using namespace sf;
 
+class Move;
 class Piece;
 class Square;
 class Board;
-class Move;
 enum piecetype {NONE, PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING};
+
+class Move
+{
+  private:
+    bool white;
+    int startrow;
+    int startcol;
+    int endrow;
+    int endcol;
+  public:
+    Move (bool white, int startrow, int startcol, int endrow, int endcol)
+    {
+      this->setWhite(white);
+      this->setStart(startrow, startcol);
+      this->setEnd(endrow, endcol);
+    }
+    bool getWhite()
+    {
+      return this->white;
+    }
+    void setWhite(bool white)
+    {
+      this->white = white;
+    }
+    vector<int> getStart()
+    {
+      return {this->startrow, this->startcol};
+    }
+    void setStart(int startrow, int startcol)
+    {
+      this->startrow = startrow;
+      this->startcol = startcol;
+    }
+    vector<int> getEnd()
+    {
+      return {this->endrow, this->endcol};
+    }
+    void setEnd(int endrow, int endcol)
+    {
+      this->endrow = endrow;
+      this->endcol = endcol;
+    }
+};
 
 class Piece
 {
@@ -195,52 +238,15 @@ class Board
         for (int j = 0; j < 8; j++)
           board[i].push_back(Square(None(true), i, j));
     }
-    void movePiece (int startrow, int startcol, int endrow, int endcol)
+    void movePiece (Move move)
     {
-      Piece p = board[startrow][startcol].getPiece();
-      board[endrow][endcol] = Square(p, endrow, endcol);
-      board[startrow][startcol] = Square(None(true), startrow, startcol);
+      vector<int> start = move.getStart();
+      vector<int> end = move.getEnd();
+      Piece p = board[start[0]][start[1]].getPiece();
+      board[end[0]][end[1]] = Square(p, end[0], end[1]);
+      board[start[0]][start[1]] = Square(None(true), start[0], start[1]);
     }
 };
-
-/*class Move
-{
-  private:
-    bool white;
-    Square start;
-    Square end;
-  public:
-    Move (bool white, Square start, Square end)
-    {
-      this->setWhite(white);
-      this->setStart(start);
-      this->setEnd(end);
-    }
-    bool getWhite()
-    {
-      return this->white;
-    }
-    void setWhite(bool white)
-    {
-      this->white = white;
-    }
-    Square getStart()
-    {
-      return this->start;
-    }
-    void setStart(Square start)
-    {
-      this->start = start;
-    }
-    Square getEnd()
-    {
-      return this->end;
-    }
-    void setEnd(Square end)
-    {
-      this->end = end;
-    }
-};*/
 
 int main (int arg, char** argv)
 {
@@ -257,6 +263,10 @@ int main (int arg, char** argv)
   Board board = Board();
   int w = 90;
   RenderWindow app(VideoMode(8 * w, 8 * w), "Chess");
+
+  Move move = Move(true, 2, 3, 5, 4);
+  vector <int> start = move.getStart();
+  cout << start[0] << start[1];
 
   bool alternate = true;
   int row;
@@ -281,7 +291,8 @@ int main (int arg, char** argv)
         }
         else
         {
-          board.movePiece(row, col, y, x);
+          Move move = Move(true, row, col, y, x);
+          board.movePiece(move);
         }
         alternate = !alternate;
       }
