@@ -7,7 +7,8 @@ using namespace sf;
 class Piece;
 class Square;
 class Board;
-enum piecetype {No, Pa, Ro, Kn, Bi, Qu, Ki};
+class Move;
+enum piecetype {NONE, PAWN, ROOK, KNIGHT, BISHOP, QUEEN, KING};
 
 class Piece
 {
@@ -49,7 +50,7 @@ class None: public Piece
   public:
     None (bool white) : Piece(white)
     {
-      type = No;
+      type = NONE;
     }
 };
 
@@ -58,7 +59,7 @@ class Pawn: public Piece
   public:
     Pawn(bool white) : Piece(white)
     {
-      type = Pa;
+      type = PAWN;
     }
 };
 
@@ -67,7 +68,7 @@ class Rook: public Piece
   public:
     Rook(bool white) : Piece(white)
     {
-      type = Ro;
+      type = ROOK;
     }
 };
 
@@ -76,7 +77,7 @@ class Knight: public Piece
   public:
     Knight(bool white) : Piece(white)
     {
-      type = Kn;
+      type = KNIGHT;
     }
 
 };
@@ -86,7 +87,7 @@ class Bishop: public Piece
   public:
     Bishop(bool white) : Piece(white)
     {
-      type = Bi;
+      type = BISHOP;
     }
 };
 
@@ -95,7 +96,7 @@ class Queen: public Piece
   public:
     Queen(bool white) : Piece(white)
     {
-      type = Qu;
+      type = QUEEN;
     }
 };
 
@@ -104,7 +105,7 @@ class King: public Piece
   public:
     King(bool white) : Piece(white)
     {
-      type = Ki;
+      type = KING;
     }
 };
 
@@ -115,6 +116,12 @@ class Square
     int row;
     int col;
   public:
+    Square()
+    {
+      this->setPiece(None(true));
+      this->setRow(0);
+      this->setCol(0);
+    }
     Square(Piece piece, int row, int col)
     {
       this->setPiece(piece);
@@ -146,6 +153,45 @@ class Square
       this->col = col;
     }
 };
+/*
+class Move
+{
+  private:
+    bool white;
+    Square start;
+    Square end;
+  public:
+    Move (bool white, Square start, Square end)
+    {
+      this->setWhite(white);
+      this->setStart(start);
+      this->setEnd(end);
+    }
+    bool getWhite()
+    {
+      return this->white;
+    }
+    void setWhite(bool white)
+    {
+      this->white = white;
+    }
+    Square getStart()
+    {
+      return this->start;
+    }
+    void setStart(Square start)
+    {
+      this->start = start;
+    }
+    Square getEnd()
+    {
+      return this->end;
+    }
+    void setEnd(Square end)
+    {
+      this->end = end;
+    }
+};*/
 
 class Board
 {
@@ -163,30 +209,36 @@ class Board
     void resetBoard()
     {
       for (int i = 0; i < 8; i++) board.push_back({});
-      board[0].push_back(Square(Rook(true), 0, 0));
-      board[0].push_back(Square(Knight(true), 0, 1));
-      board[0].push_back(Square(Bishop(true), 0, 2));
-      board[0].push_back(Square(Queen(true), 0, 3));
-      board[0].push_back(Square(King(true), 0, 4));
-      board[0].push_back(Square(Bishop(true), 0, 5));
-      board[0].push_back(Square(Knight(true), 0, 6));
-      board[0].push_back(Square(Rook(true), 0, 7));
+      board[0].push_back(Square(Rook(false), 0, 0));
+      board[0].push_back(Square(Knight(false), 0, 1));
+      board[0].push_back(Square(Bishop(false), 0, 2));
+      board[0].push_back(Square(Queen(false), 0, 3));
+      board[0].push_back(Square(King(false), 0, 4));
+      board[0].push_back(Square(Bishop(false), 0, 5));
+      board[0].push_back(Square(Knight(false), 0, 6));
+      board[0].push_back(Square(Rook(false), 0, 7));
       for (int i = 0; i < 8; i ++)
       {
-        board[1].push_back(Square(Pawn(true), 1, i));
-        board[6].push_back(Square(Pawn(false), 6, i));
+        board[1].push_back(Square(Pawn(false), 1, i));
+        board[6].push_back(Square(Pawn(true), 6, i));
       }
-      board[7].push_back(Square(Rook(false), 7, 0));
-      board[7].push_back(Square(Knight(false), 7, 1));
-      board[7].push_back(Square(Bishop(false), 7, 2));
-      board[7].push_back(Square(Queen(false), 7, 3));
-      board[7].push_back(Square(King(false), 7, 4));
-      board[7].push_back(Square(Bishop(false), 7, 5));
-      board[7].push_back(Square(Knight(false), 7, 6));
-      board[7].push_back(Square(Rook(false), 7, 7));
+      board[7].push_back(Square(Rook(true), 7, 0));
+      board[7].push_back(Square(Knight(true), 7, 1));
+      board[7].push_back(Square(Bishop(true), 7, 2));
+      board[7].push_back(Square(Queen(true), 7, 3));
+      board[7].push_back(Square(King(true), 7, 4));
+      board[7].push_back(Square(Bishop(true), 7, 5));
+      board[7].push_back(Square(Knight(true), 7, 6));
+      board[7].push_back(Square(Rook(true), 7, 7));
       for (int i = 2; i < 6; i++)
         for (int j = 0; j < 8; j++)
           board[i].push_back(Square(None(true), i, j));
+    }
+    void movePiece (int startrow, int startcol, int endrow, int endcol)
+    {
+      Piece p = board[startrow][startcol].getPiece();
+      board[endrow][endcol] = Square(p, endrow, endcol);
+      board[startrow][startcol] = Square(None(true), startrow, startcol);
     }
 };
 
@@ -206,6 +258,8 @@ int main (int arg, char** argv)
   int w = 90;
   RenderWindow app(VideoMode(8 * w, 8 * w), "Chess");
 
+  board.movePiece(0, 0, 4, 0);
+
   while (app.isOpen())
   {
     Event e;
@@ -223,28 +277,28 @@ int main (int arg, char** argv)
         int piece = -1;
         Piece p = board.getLocation(i, j).getPiece();
         int side = p.getWhite() ? 0 : 1;
-        if (p.getPiecetype() == No) continue;
+        if (p.getPiecetype() == NONE) continue;
         switch(p.getPiecetype())
         {
-          case Pa:
+          case PAWN:
             piece = 5;
             break;
-          case Ro:
+          case ROOK:
             piece = 4;
             break;
-          case Kn:
+          case KNIGHT:
             piece = 3;
             break;
-          case Bi:
+          case BISHOP:
             piece = 2;
             break;
-          case Qu:
+          case QUEEN:
             piece = 1;
             break;
-          case Ki:
+          case KING:
             piece = 0;
             break;
-          case No:
+          case NONE:
             break;
         }
         pieces.setTextureRect(IntRect(w * piece, w * side, w, w));
