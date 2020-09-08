@@ -153,45 +153,6 @@ class Square
       this->col = col;
     }
 };
-/*
-class Move
-{
-  private:
-    bool white;
-    Square start;
-    Square end;
-  public:
-    Move (bool white, Square start, Square end)
-    {
-      this->setWhite(white);
-      this->setStart(start);
-      this->setEnd(end);
-    }
-    bool getWhite()
-    {
-      return this->white;
-    }
-    void setWhite(bool white)
-    {
-      this->white = white;
-    }
-    Square getStart()
-    {
-      return this->start;
-    }
-    void setStart(Square start)
-    {
-      this->start = start;
-    }
-    Square getEnd()
-    {
-      return this->end;
-    }
-    void setEnd(Square end)
-    {
-      this->end = end;
-    }
-};*/
 
 class Board
 {
@@ -242,6 +203,45 @@ class Board
     }
 };
 
+/*class Move
+{
+  private:
+    bool white;
+    Square start;
+    Square end;
+  public:
+    Move (bool white, Square start, Square end)
+    {
+      this->setWhite(white);
+      this->setStart(start);
+      this->setEnd(end);
+    }
+    bool getWhite()
+    {
+      return this->white;
+    }
+    void setWhite(bool white)
+    {
+      this->white = white;
+    }
+    Square getStart()
+    {
+      return this->start;
+    }
+    void setStart(Square start)
+    {
+      this->start = start;
+    }
+    Square getEnd()
+    {
+      return this->end;
+    }
+    void setEnd(Square end)
+    {
+      this->end = end;
+    }
+};*/
+
 int main (int arg, char** argv)
 {
   // Board Sprite
@@ -258,14 +258,33 @@ int main (int arg, char** argv)
   int w = 90;
   RenderWindow app(VideoMode(8 * w, 8 * w), "Chess");
 
-  board.movePiece(0, 0, 4, 0);
-
+  bool alternate = true;
+  int row;
+  int col;
   while (app.isOpen())
   {
+    Vector2i pos = Mouse::getPosition(app);
+    int x = pos.x / w;
+    int y = pos.y / w;
+
     Event e;
     while (app.pollEvent(e))
     {
       if (e.type == Event::Closed) app.close();
+
+      if (e.type == Event::MouseButtonPressed && e.key.code == Mouse::Left)
+      {
+        if (alternate)
+        {
+          col = x;
+          row = y;
+        }
+        else
+        {
+          board.movePiece(row, col, y, x);
+        }
+        alternate = !alternate;
+      }
     }
 
     app.clear(Color::White);
