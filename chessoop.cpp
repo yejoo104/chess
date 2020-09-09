@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
+#include <set>
 using namespace std;
 using namespace sf;
 
@@ -18,6 +19,7 @@ class Move
     int startcol;
     int endrow;
     int endcol;
+    bool castling = false;
   public:
     Move (bool white, int startrow, int startcol, int endrow, int endcol)
     {
@@ -50,6 +52,14 @@ class Move
     {
       this->endrow = endrow;
       this->endcol = endcol;
+    }
+    bool getCastling()
+    {
+      return this->castling;
+    }
+    void setCastling(bool castling)
+    {
+      this->castling = castling;
     }
 };
 
@@ -85,7 +95,6 @@ class Piece
     {
       return this->type;
     }
-    vector <Square> possiblemoves(Board board, Square location);
 };
 
 class None: public Piece
@@ -248,6 +257,8 @@ class Board
     }
 };
 
+set<vector <int> > possiblemoves (Board board, int row, int col);
+
 int main (int arg, char** argv)
 {
   // Board Sprite
@@ -260,17 +271,19 @@ int main (int arg, char** argv)
   t2.loadFromFile("pieces.png");
   Sprite pieces(t2);
 
+  // Dot Sprite
+  Texture t3;
+  t3.loadFromFile("potential.jpg");
+  Sprite dot(t3);
+
   Board board = Board();
   int w = 90;
   RenderWindow app(VideoMode(8 * w, 8 * w), "Chess");
 
-  Move move = Move(true, 2, 3, 5, 4);
-  vector <int> start = move.getStart();
-  cout << start[0] << start[1];
-
-  bool alternate = true;
   int row;
   int col;
+  set <vector <int> > possible;
+  bool white = true;
   while (app.isOpen())
   {
     Vector2i pos = Mouse::getPosition(app);
@@ -284,17 +297,21 @@ int main (int arg, char** argv)
 
       if (e.type == Event::MouseButtonPressed && e.key.code == Mouse::Left)
       {
-        if (alternate)
+        Piece p = board.getLocation(y, x).getPiece();
+        if (white && possible.find({y, x}) != possible.end())
+        {
+          Move move = Move(white, row, col, y, x);
+          board.movePiece(move);
+          possible = set <vector <int> > ();
+          /*white = !white;*/
+        }
+        else if (white == p.getWhite())
         {
           col = x;
           row = y;
+          possible = possiblemoves(board, row, col);
         }
-        else
-        {
-          Move move = Move(true, row, col, y, x);
-          board.movePiece(move);
-        }
-        alternate = !alternate;
+        else possible = set <vector <int> > ();
       }
     }
 
@@ -336,7 +353,42 @@ int main (int arg, char** argv)
         app.draw(pieces);
       }
 
+    for (auto elem : possible)
+    {
+      dot.setScale(0.05, 0.05);
+      dot.setPosition((elem[1] + 0.5) * w - 11.25, (elem[0] + 0.5) * w - 11.25);
+      app.draw(dot);
+    }
+
     app.display();
   }
 
+}
+
+set<vector <int> > possiblemoves (Board board, int row, int col)
+{
+  Piece p = board.getLocation(row, col).getPiece();
+  piecetype type = p.getPiecetype();
+  bool white = p.getWhite();
+
+  set <vector <int> > possible;
+  if(type == PAWN)
+  {
+    // Direction of movement
+    int dir = white ? -1 : 1;
+
+    // If there is no piece directly in front
+    if (row + dir >= 0 && row + dir < 8 &&
+        board.getLocation(row + dir, col).getPiece().getPiecetype() == NONE)
+      {
+        possible.insert({row + dir, col});
+
+        // If pawn is at starting point and there is no piece for two steps
+        bool starting = (white && row == 6) || (!white && row == 1);
+        if (starting && board.getLocation(row + 2 * dir, col).getPiece().getPiecetype() == NONE)
+          possible.insert({row + 2 * dir, col});
+      }
+    }
+
+    return possible;
 }
