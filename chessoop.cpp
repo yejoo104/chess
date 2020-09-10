@@ -372,7 +372,7 @@ set<vector <int> > possiblemoves (Board board, int row, int col)
   bool white = p.getWhite();
 
   set <vector <int> > possible;
-  if(type == PAWN)
+  if (type == PAWN)
   {
     // Direction of movement
     int dir = white ? -1 : 1;
@@ -399,7 +399,28 @@ set<vector <int> > possiblemoves (Board board, int row, int col)
     }
   }
 
+  // Rook and Queen: sides
+  if (type == ROOK || type == QUEEN)
+  {
+    int xdir[4] = {1, -1, 0, 0};
+    int ydir[4] = {0, 0, 1, -1};
+    for (int i = 0; i < 4; i++)
+    {
+      int x = row + xdir[i];
+      int y = col + ydir[i];
+      while (x >= 0 && x < 8 && y >= 0 && y < 8 &&
+            board.getLocation(x, y).getPiece().getPiecetype() == NONE)
+      {
+        possible.insert({x, y});
+        x += xdir[i];
+        y += ydir[i];
+      }
 
+      if (x >= 0 && x < 8 && y >= 0 && y < 8 &&
+          board.getLocation(x, y).getPiece().getWhite() != white)
+        possible.insert({x, y});
+    }
+  }
 
   return possible;
 }
