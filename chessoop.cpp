@@ -380,15 +380,26 @@ set<vector <int> > possiblemoves (Board board, int row, int col)
     // If there is no piece directly in front
     if (row + dir >= 0 && row + dir < 8 &&
         board.getLocation(row + dir, col).getPiece().getPiecetype() == NONE)
-      {
-        possible.insert({row + dir, col});
+    {
+      possible.insert({row + dir, col});
 
-        // If pawn is at starting point and there is no piece for two steps
-        bool starting = (white && row == 6) || (!white && row == 1);
-        if (starting && board.getLocation(row + 2 * dir, col).getPiece().getPiecetype() == NONE)
-          possible.insert({row + 2 * dir, col});
-      }
+      // If pawn is at starting point and there is no piece for two steps
+      bool starting = (white && row == 6) || (!white && row == 1);
+      if (starting && board.getLocation(row + 2 * dir, col).getPiece().getPiecetype() == NONE)
+        possible.insert({row + 2 * dir, col});
     }
 
-    return possible;
+    // If there are opponent pieces to the front diagonal
+    for (int i = -1; i < 2; i = i + 2)
+    {
+      if (row + dir < 0 || row + dir > 8 || col + i < 0 || col + i >= 8) continue;
+      Piece diag = board.getLocation(row + dir, col + i).getPiece();
+      if (diag.getPiecetype() != NONE && diag.getWhite() != white)
+        possible.insert({row + dir, col + i});
+    }
+  }
+
+
+
+  return possible;
 }
