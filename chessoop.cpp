@@ -441,5 +441,28 @@ set<vector <int> > possiblemoves (Board board, int row, int col)
     }
   }
 
+  // Bishop and Queen: Diagonals
+  if (type == ROOK || type == QUEEN)
+  {
+    int xdir[4] = {1, 1, -1, -1};
+    int ydir[4] = {-1, 1, -1, 1};
+    for (int i = 0; i < 4; i++)
+    {
+      int x = row + xdir[i];
+      int y = col + ydir[i];
+      while (x >= 0 && x < 8 && y >= 0 && y < 8 &&
+            board.getLocation(x, y).getPiece().getPiecetype() == NONE)
+      {
+        possible.insert({x, y});
+        x += xdir[i];
+        y += ydir[i];
+      }
+
+      if (x >= 0 && x < 8 && y >= 0 && y < 8 &&
+          board.getLocation(x, y).getPiece().getWhite() != white)
+        possible.insert({x, y});
+    }
+  }
+
   return possible;
 }
