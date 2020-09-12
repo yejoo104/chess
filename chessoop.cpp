@@ -464,5 +464,24 @@ set<vector <int> > possiblemoves (Board board, int row, int col)
     }
   }
 
+  // King
+  if (type == KING)
+  {
+    int xdir[8] = {1, 1, 1, 0, 0, -1, -1, -1};
+    int ydir[8] = {1, 0, -1, 1, -1, 1, 0, -1};
+
+    for (int i = 0; i < 8; i++)
+    {
+      int x = row + xdir[i];
+      int y = col + ydir[i];
+      if (x >= 0 && x < 8 && y >= 0 && y < 8)
+      {
+        Piece poten = board.getLocation(x, y).getPiece();
+        if (poten.getPiecetype() == NONE) possible.insert({x, y});
+        else if (poten.getWhite() != white) possible.insert({x, y});
+      }
+    }
+  }
+
   return possible;
 }
