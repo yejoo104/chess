@@ -485,3 +485,21 @@ set<vector <int> > possiblemoves (Board board, int row, int col)
 
   return possible;
 }
+
+vector <vector <int> > possiblefromboard (Board board, bool white)
+{
+  // Find all possible moves from the side
+  vector <vector <int> > possible;
+  for (int i = 0; i < 8; i++)
+    for (int j = 0; j < 8; j++)
+    {
+      Piece p = board.getLocation(i, j).getPiece();
+      if (p.getWhite() == white)
+      {
+        set <vector <int> > possiblehere = possiblemoves(board, i, j);
+        for (auto elem : possiblehere) possible.push_back({i, j, elem[0], elem[1]});
+      }
+    }
+
+  return possible;
+}
