@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <set>
+#include <random>
 using namespace std;
 using namespace sf;
 
@@ -258,6 +259,7 @@ class Board
 };
 
 set<vector <int> > possiblemoves (Board board, int row, int col);
+vector <int> computerrandom (Board board, bool white);
 
 int main (int arg, char** argv)
 {
@@ -284,6 +286,7 @@ int main (int arg, char** argv)
   int col;
   set <vector <int> > possible;
   bool white = true;
+  bool win = false;
   while (app.isOpen())
   {
     Vector2i pos = Mouse::getPosition(app);
@@ -303,7 +306,7 @@ int main (int arg, char** argv)
           Move move = Move(white, row, col, y, x);
           board.movePiece(move);
           possible = set <vector <int> > ();
-          /*white = !white;*/
+          white = !white;
         }
         else if (white == p.getWhite())
         {
@@ -361,6 +364,15 @@ int main (int arg, char** argv)
     }
 
     app.display();
+
+    // If black's turn computer makes move
+    if (!win && !white)
+    {
+      vector<int> newmove = computerrandom(board,false);
+      Move blackmove = Move(white, newmove[0], newmove[1], newmove[2], newmove[3]);
+      board.movePiece(blackmove);
+      white = !white;
+    }
   }
 
 }
@@ -502,4 +514,17 @@ vector <vector <int> > possiblefromboard (Board board, bool white)
     }
 
   return possible;
+}
+
+vector <int> computerrandom (Board board, bool white)
+{
+  vector <vector <int> > possible = possiblefromboard(board, white);
+
+  // Choose Random Move
+  random_device device;
+  mt19937 generator(device());
+  uniform_int_distribution<> dis(0, possible.size() - 1);
+
+  int random = dis(generator);
+  return possible[random];
 }
