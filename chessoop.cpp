@@ -259,7 +259,7 @@ class Board
 };
 
 set<vector <int> > possiblemoves (Board board, int row, int col);
-vector <int> computerrandom (Board board, bool white);
+Move computerrandom (Board board, bool white);
 
 int main (int arg, char** argv)
 {
@@ -368,9 +368,8 @@ int main (int arg, char** argv)
     // If black's turn computer makes move
     if (!win && !white)
     {
-      vector<int> newmove = computerrandom(board,false);
-      Move blackmove = Move(white, newmove[0], newmove[1], newmove[2], newmove[3]);
-      board.movePiece(blackmove);
+      Move newmove = computerrandom(board,false);
+      board.movePiece(newmove);
       white = !white;
     }
   }
@@ -454,7 +453,7 @@ set<vector <int> > possiblemoves (Board board, int row, int col)
   }
 
   // Bishop and Queen: Diagonals
-  if (type == ROOK || type == QUEEN)
+  if (type == BISHOP || type == QUEEN)
   {
     int xdir[4] = {1, 1, -1, -1};
     int ydir[4] = {-1, 1, -1, 1};
@@ -498,10 +497,10 @@ set<vector <int> > possiblemoves (Board board, int row, int col)
   return possible;
 }
 
-vector <vector <int> > possiblefromboard (Board board, bool white)
+vector <Move> possiblefromboard (Board board, bool white)
 {
   // Find all possible moves from the side
-  vector <vector <int> > possible;
+  vector <Move> possible;
   for (int i = 0; i < 8; i++)
     for (int j = 0; j < 8; j++)
     {
@@ -509,16 +508,16 @@ vector <vector <int> > possiblefromboard (Board board, bool white)
       if (p.getWhite() == white)
       {
         set <vector <int> > possiblehere = possiblemoves(board, i, j);
-        for (auto elem : possiblehere) possible.push_back({i, j, elem[0], elem[1]});
+        for (auto elem : possiblehere) possible.push_back(Move(white, i, j, elem[0], elem[1]));
       }
     }
 
   return possible;
 }
 
-vector <int> computerrandom (Board board, bool white)
+Move computerrandom (Board board, bool white)
 {
-  vector <vector <int> > possible = possiblefromboard(board, white);
+  vector <Move> possible = possiblefromboard(board, white);
 
   // Choose Random Move
   random_device device;
