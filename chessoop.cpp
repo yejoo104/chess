@@ -256,6 +256,43 @@ class Board
       board[end[0]][end[1]] = Square(p, end[0], end[1]);
       board[start[0]][start[1]] = Square(None(true), start[0], start[1]);
     }
+    int evaluate()
+    {
+      int value = 0;
+      for (int i = 0; i < 8; i++)
+        for (int j = 0; j < 8; j++)
+        {
+          Piece p = this->getLocation(i, j).getPiece();
+          int side = p.getWhite() ? 1 : -1;
+          int pieceval = 0;
+          switch (p.getPiecetype())
+          {
+            case NONE:
+              break;
+            case PAWN:
+              pieceval = 10;
+              break;
+            case ROOK:
+              pieceval = 50;
+              break;
+            case KNIGHT:
+              pieceval = 30;
+              break;
+            case BISHOP:
+              pieceval = 30;
+              break;
+            case QUEEN:
+              pieceval = 90;
+              break;
+            case KING:
+              pieceval = 900;
+              break;
+          }
+          value += side * pieceval;
+        }
+
+      return value;
+    }
 };
 
 set<vector <int> > possiblemoves (Board board, int row, int col);
@@ -526,46 +563,4 @@ Move computerrandom (Board board, bool white)
 
   int random = dis(generator);
   return possible[random];
-}
-
-int evaluate (Board board, Move move)
-{
-  Board hypothetical = board;
-
-  hypothetical.movePiece(move);
-
-  int value = 0;
-  for (int i = 0; i < 8; i++)
-    for (int j = 0; j < 8; j++)
-    {
-      Piece p = hypothetical.getLocation(i, j).getPiece();
-      int side = p.getWhite() ? 1 : -1;
-      int pieceval = 0;
-      switch (p.getPiecetype())
-      {
-        case NONE:
-          break;
-        case PAWN:
-          pieceval = 10;
-          break;
-        case ROOK:
-          pieceval = 50;
-          break;
-        case KNIGHT:
-          pieceval = 30;
-          break;
-        case BISHOP:
-          pieceval = 30;
-          break;
-        case QUEEN:
-          pieceval = 90;
-          break;
-        case KING:
-          pieceval = 900;
-          break;
-      }
-      value += side * pieceval;
-    }
-
-  return value;
 }
