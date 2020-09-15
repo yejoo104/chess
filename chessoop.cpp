@@ -297,6 +297,7 @@ class Board
 
 set<vector <int> > possiblemoves (Board board, int row, int col);
 Move computerrandom (Board board, bool white);
+Move computernexteval (Board board, bool white);
 
 int main (int arg, char** argv)
 {
@@ -405,7 +406,7 @@ int main (int arg, char** argv)
     // If black's turn computer makes move
     if (!win && !white)
     {
-      Move newmove = computerrandom(board,false);
+      Move newmove = computernexteval(board,false);
       board.movePiece(newmove);
       white = !white;
     }
@@ -563,4 +564,33 @@ Move computerrandom (Board board, bool white)
 
   int random = dis(generator);
   return possible[random];
+}
+
+Move computernexteval (Board board, bool white)
+{
+  vector <Move> possible = possiblefromboard(board, white);
+
+  vector <int> values;
+  int val = white ? -1300 : 1300;
+  for (int i = 0; i < possible.size(); i++)
+  {
+    Board hypothetical = board;
+    hypothetical.movePiece(possible[i]);
+    int evaluation = hypothetical.evaluate();
+    values.push_back(evaluation);
+    if ((white && evaluation > val) || (!white && evaluation < val)) val = evaluation;
+  }
+
+  vector <int> indices;
+  for (int i = 0; i < values.size(); i++)
+  {
+    if (val == values[i]) indices.push_back(i);
+  }
+
+  // Choose Random Move
+  random_device device;
+  mt19937 generator(device());
+  uniform_int_distribution<> dis (0, indices.size() - 1);
+
+  return possible[indices[dis(generator)]];
 }
