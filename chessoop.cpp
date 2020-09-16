@@ -594,3 +594,33 @@ Move computernexteval (Board board, bool white)
 
   return possible[indices[dis(generator)]];
 }
+
+int minimax (Board board, int depth, bool isMax)
+{
+  if (depth == 0) return board.evaluate();
+  vector <Move> possible = possiblefromboard(board, isMax);
+
+  if (isMax)
+  {
+    int value = -1300;
+    for (int i = 0 ; i < possible.size(); i++)
+    {
+      Board hypothetical = board;
+      hypothetical.movePiece(possible[i]);
+      value = max(value, minimax(hypothetical, depth - 1, false));
+    }
+    return value;
+  }
+
+  else
+  {
+    int value = 1300;
+    for (int i = 0; i < possible.size(); i++)
+    {
+      Board hypothetical = board;
+      hypothetical.movePiece(possible[i]);
+      value = min(value, minimax(hypothetical, depth - 1, true));
+    }
+    return value;
+  }
+}
