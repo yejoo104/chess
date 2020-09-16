@@ -298,6 +298,7 @@ class Board
 set<vector <int> > possiblemoves (Board board, int row, int col);
 Move computerrandom (Board board, bool white);
 Move computernexteval (Board board, bool white);
+Move minimaxmove (Board board, int depth, bool white);
 
 int main (int arg, char** argv)
 {
@@ -406,7 +407,7 @@ int main (int arg, char** argv)
     // If black's turn computer makes move
     if (!win && !white)
     {
-      Move newmove = computernexteval(board,false);
+      Move newmove = minimaxmove(board, 3, false);
       board.movePiece(newmove);
       white = !white;
     }
@@ -623,4 +624,34 @@ int minimax (Board board, int depth, bool isMax)
     }
     return value;
   }
+}
+
+Move minimaxmove (Board board, int depth, bool white)
+{
+  vector <Move> possible = possiblefromboard(board, white);
+
+  vector <int> values;
+  int val = white ? -1300 : 1300;
+
+  for (int i = 0; i < possible.size(); i++)
+  {
+    Board hypothetical = board;
+    hypothetical.movePiece(possible[i]);
+    int minimaxval = minimax(hypothetical, depth, !white);
+    values.push_back(minimaxval);
+    if ((white && minimaxval > val) || (!white && minimaxval < val)) val = minimaxval;
+  }
+
+  vector <int> indices;
+  for (int i = 0; i < values.size(); i++)
+  {
+    if (val == values[i]) indices.push_back(i);
+  }
+
+  // Choose Random Move
+  random_device device;
+  mt19937 generator(device());
+  uniform_int_distribution<> dis (0, indices.size() - 1);
+
+  return possible[indices[dis(generator)]];
 }
