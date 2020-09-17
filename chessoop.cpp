@@ -407,7 +407,7 @@ int main (int arg, char** argv)
     // If black's turn computer makes move
     if (!win && !white)
     {
-      Move newmove = minimaxmove(board, 3, false);
+      Move newmove = minimaxmove(board, 2, false);
       board.movePiece(newmove);
       white = !white;
     }
@@ -596,7 +596,7 @@ Move computernexteval (Board board, bool white)
   return possible[indices[dis(generator)]];
 }
 
-int minimax (Board board, int depth, bool isMax)
+int minimax (Board board, int depth, int alpha, int beta, bool isMax)
 {
   if (depth == 0) return board.evaluate();
   vector <Move> possible = possiblefromboard(board, isMax);
@@ -608,7 +608,10 @@ int minimax (Board board, int depth, bool isMax)
     {
       Board hypothetical = board;
       hypothetical.movePiece(possible[i]);
-      value = max(value, minimax(hypothetical, depth - 1, false));
+      int eval = minimax (hypothetical, depth - 1, alpha, beta, false);
+      value = max (value, eval);
+      alpha = max (alpha, eval);
+      if (beta <= alpha) break;
     }
     return value;
   }
@@ -620,7 +623,10 @@ int minimax (Board board, int depth, bool isMax)
     {
       Board hypothetical = board;
       hypothetical.movePiece(possible[i]);
-      value = min(value, minimax(hypothetical, depth - 1, true));
+      int eval = minimax (hypothetical, depth - 1, alpha, beta, true);
+      value = min (value, eval);
+      beta = min (beta, eval);
+      if (beta <= alpha) break;
     }
     return value;
   }
@@ -637,7 +643,7 @@ Move minimaxmove (Board board, int depth, bool white)
   {
     Board hypothetical = board;
     hypothetical.movePiece(possible[i]);
-    int minimaxval = minimax(hypothetical, depth, !white);
+    int minimaxval = minimax(hypothetical, depth, -1300, 1300, !white);
     values.push_back(minimaxval);
     if ((white && minimaxval > val) || (!white && minimaxval < val)) val = minimaxval;
   }
