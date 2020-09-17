@@ -321,11 +321,23 @@ int main (int arg, char** argv)
   int w = 90;
   RenderWindow app(VideoMode(8 * w, 8 * w), "Chess");
 
+  // Winner Message
+  Font font;
+  font.loadFromFile("Ka Blam.ttf");
+  Text winner;
+  winner.setFont(font);
+  winner.setCharacterSize(w);
+  winner.setFillColor(Color::Black);
+  winner.setStyle(Text::Bold);
+
+  // Variables for Game to Run
   int row;
   int col;
   set <vector <int> > possible;
   bool white = true;
   bool win = false;
+
+  // Game Runs
   while (app.isOpen())
   {
     Vector2i pos = Mouse::getPosition(app);
@@ -337,12 +349,13 @@ int main (int arg, char** argv)
     {
       if (e.type == Event::Closed) app.close();
 
-      if (e.type == Event::MouseButtonPressed && e.key.code == Mouse::Left)
+      if (!win && e.type == Event::MouseButtonPressed && e.key.code == Mouse::Left)
       {
         Piece p = board.getLocation(y, x).getPiece();
         if (white && possible.find({y, x}) != possible.end())
         {
           Move move = Move(white, row, col, y, x);
+          if (board.getLocation(y, x).getPiece().getPiecetype() == KING) win = true;
           board.movePiece(move);
           possible = set <vector <int> > ();
           white = !white;
@@ -402,12 +415,22 @@ int main (int arg, char** argv)
       app.draw(dot);
     }
 
+    if (win)
+    {
+      if (white) winner.setString("BLACK WINS");
+      else winner.setString("WHITE WINS");
+      winner.setPosition (4 * w, 4 * w);
+      winner.setOrigin(winner.getLocalBounds().width / 2.0f, winner.getLocalBounds().height / 2.0f);
+      app.draw(winner);
+    }
+
     app.display();
 
     // If black's turn computer makes move
     if (!win && !white)
     {
       Move newmove = minimaxmove(board, 2, false);
+      if (board.getLocation(newmove.getEnd()[0], newmove.getEnd()[1]).getPiece().getPiecetype() == KING) win = true;
       board.movePiece(newmove);
       white = !white;
     }
