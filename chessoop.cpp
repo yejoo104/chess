@@ -567,10 +567,15 @@ vector <Move> possiblefromboard (Board board, bool white)
     for (int j = 0; j < 8; j++)
     {
       Piece p = board.getLocation(i, j).getPiece();
-      if (p.getWhite() == white)
+      if (p.getPiecetype() != NONE && p.getWhite() == white)
       {
         set <vector <int> > possiblehere = possiblemoves(board, i, j);
-        for (auto elem : possiblehere) possible.push_back(Move(white, i, j, elem[0], elem[1]));
+        for (auto elem : possiblehere)
+        {
+          if (board.getLocation(elem[0], elem[1]).getPiece().getPiecetype() != NONE)
+            possible.insert(possible.begin(), Move (white, i, j, elem[0], elem[1]));
+          else possible.push_back(Move(white, i, j, elem[0], elem[1]));
+        }
       }
     }
 
